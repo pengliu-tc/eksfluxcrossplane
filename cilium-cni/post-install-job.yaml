@@ -1,0 +1,81 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cni-install-job
+  namespace: flux-system
+spec:
+  template:
+    spec:
+      serviceAccountName: cni-install-service-account
+      initContainers:
+      - name: install-cilium-init-container
+        image: bitnami/kubectl:1.22
+        #image: docker-hub-remote.bahnhub.tech.rz.db.de/bitnami/kubectl:1.22
+        command:
+        - "kubectl"
+        - "wait"
+        - "--for=condition=ready"
+        - "--namespace"
+        - "kube-system"
+        - "pod"
+        - "--selector=io.cilium/app=operator"
+        - "--timeout=300s"
+      - name: cilium-wait-container
+        image: bitnami/kubectl:1.22
+        #image: docker-hub-remote.bahnhub.tech.rz.db.de/bitnami/kubectl:1.22
+        command:
+        - "kubectl"
+        - "wait"
+        - "--for=condition=ready"
+        - "--namespace"
+        - "kube-system"
+        - "pod"
+        - "--selector=k8s-app=cilium"
+        - "--timeout=300s"
+      containers:
+      - name: install-clilium-container
+        image: bitnami/kubectl:1.22
+        #image: docker-hub-remote.bahnhub.tech.rz.db.de/bitnami/kubectl:1.22
+        command: 
+        - "/bin/bash"
+        - "/sbin/entrypoint.sh"
+        volumeMounts:
+          - name: scripts
+            mountPath: /sbin/entrypoint.sh
+            subPath: entrypoint.sh
+          - name: scripts
+            mountPath: /sbin/k8s-unmanaged.sh
+            subPath: k8s-unmanaged.sh
+      volumes:
+        - name: scripts
+          configMap:
+            name: cni-install-job
+      restartPolicy: OnFailure
+  backoffLimit: 4
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: manage-ipsec-keys-job
+  namespace: flux-system
+spec:
+  template:
+    spec:
+      serviceAccountName: cni-install-service-account
+      containers:
+      - name: install-ipsec-keys
+        image: ubuntu:22.04
+        #image: db-cd-lib-docker-release-local.bahnhub.tech.rz.db.de/ultimate-cloud-cli:1.0.130-20220902130847-7da3b08
+        command:
+        - "/bin/bash"
+        - "/sbin/manage-ipsec-keys.sh"
+        volumeMounts:
+          - name: scripts
+            mountPath: /sbin/manage-ipsec-keys.sh
+            subPath: manage-ipsec-keys.sh
+      volumes:
+        - name: scripts
+          configMap:
+            name: cni-install-job
+      restartPolicy: OnFailure
+  backoffLimit: 4

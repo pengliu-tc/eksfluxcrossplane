@@ -1,0 +1,9 @@
+apiVersion: v1
+data:
+  keys: ""
+kind: Secret
+metadata:
+  annotations:
+    kustomize.toolkit.fluxcd.io/reconcile: enabled
+  name: cilium-ipsec-keys
+  namespace: kube-system

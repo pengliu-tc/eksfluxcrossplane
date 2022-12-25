@@ -1,0 +1,108 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cni-install-service-account
+  namespace: flux-system   
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cni-install-clusterrolebinding
+subjects:
+- kind: ServiceAccount
+  name: cni-install-service-account
+  namespace: flux-system
+roleRef:
+  kind: ClusterRole
+  name: cni-install-clusterrole
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cni-install-clusterrole
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - 'namespaces'
+  - 'pods'
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - '*'
+  resources:
+  - 'daemonsets'
+  resourceNames:
+  - 'aws-node'
+  verbs: ["delete", "list", "get", "watch"]
+- apiGroups:
+  - ''
+  resources:
+  - 'nodes'
+  verbs: ["get", "patch", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cni-install-rolebinding
+  namespace: flux-system
+subjects:
+- kind: ServiceAccount
+  name: cni-install-service-account
+  namespace: flux-system
+roleRef:
+  kind: Role
+  name: cni-install-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cni-install-role
+  namespace: flux-system
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - 'pods'
+  verbs: ["delete"]
+- apiGroups:
+  - 'cilium.io'
+  resources:
+  - 'ciliumendpoints'
+  verbs: ["list", "get", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cni-install-rolebinding
+  namespace: kube-system
+subjects:
+- kind: ServiceAccount
+  name: cni-install-service-account
+  namespace: flux-system
+roleRef:
+  kind: Role
+  name: cni-install-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cni-install-role
+  namespace: kube-system
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - 'secrets'
+  resourceNames:
+  - 'cilium-ipsec-keys'
+  verbs: ["*"]
+- apiGroups:
+  - 'apps'
+  resources:
+  - 'daemonsets'
+  resourceNames:
+  - 'cilium'
+  verbs: ["get","patch"]

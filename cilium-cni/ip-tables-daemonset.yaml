@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: iptables-flusher
+  namespace: default
+  labels:
+    k8s-app: iptables-flusher
+spec:
+  selector:
+    matchLabels:
+      name: iptables-flusher
+  template:
+    metadata:
+      labels:
+        name: iptables-flusher
+    spec:
+      serviceAccountName: ip-tables-service-account
+      nodeSelector: 
+        iptables: notflushed
+      initContainers:
+      - name: iptables-flusher-container
+        image: ubuntu:22.04
+        #image: docker-hub-remote.bahnhub.tech.rz.db.de/library/ubuntu:22.04
+        command: ["/bin/sh"]
+        # see: https://docs.cilium.io/en/stable/gettingstarted/k8s-install-helm/
+        # => EKS => !Note => 2. Flush iptables rules added by AWS VPC CNI
+        # need to do that on the worker node host OS that's why we use a Daemonset and chroot + NET_ADMIN caps
+        args: ['-c', 'chroot /host /bin/sh -c "iptables -t nat -F AWS-SNAT-CHAIN-0 && iptables -t nat -F AWS-SNAT-CHAIN-1 && iptables -t nat -F AWS-CONNMARK-CHAIN-0 && iptables -t nat -F AWS-CONNMARK-CHAIN-1"; ']
+        securityContext:
+          privileged: true
+          capabilities:
+            add: 
+            - NET_ADMIN
+        volumeMounts:
+        - mountPath: /host
+          name: host-root
+      containers:
+      - name: iptables-notflushed-label-removal-container
+        image: bitnami/kubectl:1.22
+        #image: docker-hub-remote.bahnhub.tech.rz.db.de/bitnami/kubectl:1.22
+        # remove iptables flush labels after successful AWS VPC CNI iptable rules flushing
+        command:
+        - "kubectl"
+        - "label"
+        - "nodes"
+        - "$(NODE_NAME)"
+        - "iptables-" 
+        env:
+          - name: NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+      hostIPC: true
+      hostNetwork: true
+      hostPID: true
+      volumes:
+      - hostPath:
+          path: /
+          type: ""
+        name: host-root
