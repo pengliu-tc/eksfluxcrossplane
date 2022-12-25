@@ -1,0 +1,10 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: example-configmap
+#  namespace: mazumo-ent1
+  labels:
+    deployment: example
+    envirnoment: ent1
+data:
+  example: test
