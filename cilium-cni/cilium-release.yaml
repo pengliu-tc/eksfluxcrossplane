@@ -22,24 +22,24 @@ spec:
     - kustomize:
         images:
           - name: quay.io/cilium/operator-generic
-            newName: quay-docker-remote.bahnhub.tech.rz.db.de/cilium/operator-generic
+#            newName: quay-docker-remote.bahnhub.tech.rz.db.de/cilium/operator-generic
           - name: quay.io/cilium/cilium
-            newName: quay-docker-remote.bahnhub.tech.rz.db.de/cilium/cilium
+#            newName: quay-docker-remote.bahnhub.tech.rz.db.de/cilium/cilium
           - name: quay.io/cilium/certgen
-            newName: quay-docker-remote.bahnhub.tech.rz.db.de/cilium/certgen
+#            newName: quay-docker-remote.bahnhub.tech.rz.db.de/cilium/certgen
           - name: quay.io/cilium/hubble-relay
-            newName: quay-docker-remote.bahnhub.tech.rz.db.de/cilium/hubble-relay
+#            newName: quay-docker-remote.bahnhub.tech.rz.db.de/cilium/hubble-relay
           - name: quay.io/cilium/hubble-ui-backend
-            newName: quay-docker-remote.bahnhub.tech.rz.db.de/cilium/hubble-ui-backend
+#            newName: quay-docker-remote.bahnhub.tech.rz.db.de/cilium/hubble-ui-backend
           - name: quay.io/cilium/hubble-ui
-            newName: quay-docker-remote.bahnhub.tech.rz.db.de/cilium/hubble-ui
+#            newName: quay-docker-remote.bahnhub.tech.rz.db.de/cilium/hubble-ui
           - name: quay.io/cilium/cilium-etcd-operator
-            newName: quay-docker-remote.bahnhub.tech.rz.db.de/cilium/cilium-etcd-operator
+#            newName: quay-docker-remote.bahnhub.tech.rz.db.de/cilium/cilium-etcd-operator
           - name: quay.io/cilium/startup-script
-            newName: quay-docker-remote.bahnhub.tech.rz.db.de/cilium/startup-script
+#            newName: quay-docker-remote.bahnhub.tech.rz.db.de/cilium/startup-script
           - name: quay.io/cilium/clustermesh-apiserver
-            newName: quay-docker-remote.bahnhub.tech.rz.db.de/cilium/clustermesh-apiserver
+#            newName: quay-docker-remote.bahnhub.tech.rz.db.de/cilium/clustermesh-apiserver
           - name: quay.io/coreos/etcd
-            newName: quay-docker-remote.bahnhub.tech.rz.db.de/coreos/etcd
+#            newName: quay-docker-remote.bahnhub.tech.rz.db.de/coreos/etcd
           - name: docker.io/envoyproxy/envoy
-            newName: docker-hub-remote.bahnhub.tech.rz.db.de/envoyproxy/envoy
+#            newName: docker-hub-remote.bahnhub.tech.rz.db.de/envoyproxy/envoy
